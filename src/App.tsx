@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 // Store upgradges
 // Show Amount increase when clicked on mouse
 // **** Upgrades *** \\
+// Make it so you can buy upgrades
 // Can buy upgrades at different points in the game
 // Create an Update Queue - upgrades that are not shown can be bought after the buying the ones first in the queue.
 //
@@ -24,6 +25,7 @@ const upgrades = [
     multiplier: 3,
   },
 ];
+
 interface BasicUpgrade {
   id: number;
   name: string;
@@ -59,12 +61,12 @@ function App() {
       className="grid place-content-center min-h-screen"
     >
       <ScoreDisplay score={score} currency={currency} />
-      <Upgrades />
+      <Upgrades applyBasicUpgrade={applyBasicUpgrade} />
     </div>
   );
 }
 
-const Upgrades = () => {
+const Upgrades = (props) => {
   const Upgrade = (props: { upgrade: BasicUpgrade }) => {
     console.log(props.upgrade);
     return <div></div>;
