@@ -4,6 +4,8 @@ import { createPortal } from "react-dom";
 // Store upgradges
 // Show Amount increase when clicked on mouse
 // **** Upgrades *** \\
+// Can buy upgrades at different points in the game
+// Create an Update Queue - upgrades that are not shown can be bought after the buying the ones first in the queue.
 //
 
 const upgrades = [
