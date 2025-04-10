@@ -39,8 +39,10 @@ function App() {
   const [currency, setCurrency] = useState(0);
   const [multiplier, setMultiplier] = useState(2);
 
-  const applyBasicUpgrade = (upgrade: BasicUpgrade) => {
+  const purchaseBasicUpgrade = (upgrade: BasicUpgrade) => {
     if (currency <= upgrade.cost) {
+      setCurrency(currency - upgrade.cost);
+      console.log(upgrade.name + "bought!" + "You Spent" + upgrade.cost);
       return;
     }
 
@@ -61,21 +63,35 @@ function App() {
       className="grid place-content-center min-h-screen"
     >
       <ScoreDisplay score={score} currency={currency} />
-      <Upgrades applyBasicUpgrade={applyBasicUpgrade} />
+      <Upgrades purchaseBasicUpgrade={purchaseBasicUpgrade} />
     </div>
   );
 }
 
 const Upgrades = (props) => {
-  const Upgrade = (props: { upgrade: BasicUpgrade }) => {
-    console.log(props.upgrade);
-    return <div></div>;
-  };
   return (
-    <div className="border bottom-4 absolute w-full max-w-xl mx-auto">
+    <div className="border bottom-4 absolute w-full max-w-xl mx-auto flex gap-8">
       {upgrades.map((upgrade, upgradeIdx) => (
-        <Upgrade upgrade={upgrade} key={upgradeIdx}></Upgrade>
+        <Upgrade
+          purchaseBasicUpgrade={props.purchaseBasicUpgrade}
+          upgrade={upgrade}
+          key={upgradeIdx}
+        ></Upgrade>
       ))}
+    </div>
+  );
+};
+
+const Upgrade = (props: {
+  upgrade: BasicUpgrade;
+  purchaseBasicUpgrade: any;
+}) => {
+  const { cost, description, name, multiplier } = props.upgrade;
+  const { purchaseBasicUpgrade } = props.purchaseBasicUpgrade;
+  console.log(props.upgrade);
+  return (
+    <div className="border">
+      <button onClick={() => purchaseBasicUpgrade(props.upgrade)}></button>
     </div>
   );
 };
