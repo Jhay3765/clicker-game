@@ -44,17 +44,15 @@ function App() {
     setCurrency(currency + 1 * multiplier);
   };
 
-  const purchaseBasicUpgrade = (props: { upgrade: BasicUpgrade }) => {
-    console.log(props.upgrade);
-    // if (currency >= props.upgrade.cost) {
-    //   setCurrency(currency - props.upgrade.cost);
+  const purchaseBasicUpgrade = (upgrade: BasicUpgrade) => {
+    console.log(upgrade);
+    if (currency >= upgrade.cost) {
+      setCurrency(currency - upgrade.cost);
 
-    //   console.log(
-    //     props.upgrade.name + "bought!" + "You Spent " + props.upgrade.cost
-    //   );
-    //   setMultiplier(props.upgrade.multiplier);
-    //   return;
-    // }
+      console.log(upgrade.name + "bought!" + "You Spent " + upgrade.cost);
+      setMultiplier(upgrade.multiplier);
+      return;
+    }
 
     // setCurrency((prevCurrency) => {
     //   console.log("setting curreny ");
@@ -108,6 +106,8 @@ const Upgrade = (props: {
     </div>
   );
 };
+
+const MouseCoin = ()
 
 const ScoreDisplay = (props: {
   score: number;
