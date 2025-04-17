@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 // Store upgradges
@@ -36,73 +36,91 @@ interface BasicUpgrade {
 
 function App() {
   const [score, setScore] = useState(0);
-  const [currency, setCurrency] = useState(0);
+  const [currency, setCurrency] = useState(150);
   const [multiplier, setMultiplier] = useState(2);
-
-  const purchaseBasicUpgrade = (upgrade: BasicUpgrade) => {
-    if (currency <= upgrade.cost) {
-      setCurrency(currency - upgrade.cost);
-      console.log(upgrade.name + "bought!" + "You Spent" + upgrade.cost);
-      return;
-    }
-
-    setCurrency((prevCurrency) => {
-      const newCurrency = prevCurrency - upgrade.cost;
-      return newCurrency;
-    });
-  };
 
   const increaseScore = () => {
     setScore(score + 1);
     setCurrency(currency + 1 * multiplier);
   };
 
+  const purchaseBasicUpgrade = (props: { upgrade: BasicUpgrade }) => {
+    console.log(props.upgrade);
+    // if (currency >= props.upgrade.cost) {
+    //   setCurrency(currency - props.upgrade.cost);
+
+    //   console.log(
+    //     props.upgrade.name + "bought!" + "You Spent " + props.upgrade.cost
+    //   );
+    //   setMultiplier(props.upgrade.multiplier);
+    //   return;
+    // }
+
+    // setCurrency((prevCurrency) => {
+    //   console.log("setting curreny ");
+    //   const newCurrency = prevCurrency - upgrade.cost;
+    //   return newCurrency;
+    // });
+  };
+
   return (
-    <div
-      onClick={increaseScore}
-      className="grid place-content-center min-h-screen"
-    >
-      <ScoreDisplay score={score} currency={currency} />
-      <Upgrades purchaseBasicUpgrade={purchaseBasicUpgrade} />
-    </div>
+    <main className="grid place-content-center min-h-screen">
+      <div onClick={increaseScore} className="fixed h-screen w-screen  ">
+        <ScoreDisplay
+          score={score}
+          currency={currency}
+          multiplier={multiplier}
+        />
+      </div>
+
+      <div className="border z-40 bottom-4 absolute w-full justify-center py-1 flex gap-8">
+        {upgrades.map((upgrade, upgradeIdx) => (
+          <Upgrade
+            purchaseBasicUpgrade={purchaseBasicUpgrade}
+            upgrade={upgrade}
+            key={upgradeIdx}
+          ></Upgrade>
+        ))}
+      </div>
+    </main>
   );
 }
-
-const Upgrades = (props) => {
-  return (
-    <div className="border bottom-4 absolute w-full max-w-xl mx-auto flex gap-8">
-      {upgrades.map((upgrade, upgradeIdx) => (
-        <Upgrade
-          purchaseBasicUpgrade={props.purchaseBasicUpgrade}
-          upgrade={upgrade}
-          key={upgradeIdx}
-        ></Upgrade>
-      ))}
-    </div>
-  );
-};
 
 const Upgrade = (props: {
   upgrade: BasicUpgrade;
   purchaseBasicUpgrade: any;
 }) => {
   const { cost, description, name, multiplier } = props.upgrade;
-  const { purchaseBasicUpgrade } = props.purchaseBasicUpgrade;
-  console.log(props.upgrade);
+
   return (
     <div className="border">
-      <button onClick={() => purchaseBasicUpgrade(props.upgrade)}></button>
+      <h2>{name}</h2>
+      <p>{description}</p>
+      <p>Cost: ${cost}</p>
+
+      <button
+        className="bg-amber-700 px-4 py-1 cursor-pointer text-white rounded-md hover:bg-amber-600"
+        disabled={props.upgrade.cost > props.upgrade.cost}
+        onClick={() => props.purchaseBasicUpgrade(props.upgrade)}
+      >
+        Purchase
+      </button>
     </div>
   );
 };
 
-const ScoreDisplay = (props: { score: number; currency: number }) => {
+const ScoreDisplay = (props: {
+  score: number;
+  currency: number;
+  multiplier: number;
+}) => {
   return (
     <>
       {createPortal(
         <div className="fixed font-bold text-2xl top-2 border p-16 grid place-content-center left-2">
           <div>Clicks : {props.score}</div>
           <div>Currency : ${props.currency}</div>
+          <div>Multiplier : {props.multiplier}</div>
         </div>,
 
         document.body
