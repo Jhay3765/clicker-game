@@ -1,5 +1,6 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Plot from "./components/Plot";
 
 // Store upgradges
 // Show Amount increase when clicked on mouse
@@ -7,20 +8,16 @@ import { createPortal } from "react-dom";
 // Make it so you can buy upgrades
 // Can buy upgrades at different points in the game
 // Create an Update Queue - upgrades that are not shown can be bought after the buying the ones first in the queue.
-//
-interface Crop {
-  cropProfit: number;
-  cropName: string;
-  increaseCurrency: (amount: number) => void;
-}
+// Pointer events none not working on the coin
 
 const upgrades = [
   {
     id: 1,
     name: "2x Crop Multiplier",
-    description: "Double your crops per click!",
+    description: "Triple your coins per click!",
     cost: 50,
     multiplier: 2,
+    requiredLevel: 1,
   },
   {
     id: 2,
@@ -28,6 +25,7 @@ const upgrades = [
     description: "Triple your crops per click!",
     cost: 150,
     multiplier: 3,
+    requiredLevel: 2,
   },
 ];
 
@@ -43,17 +41,19 @@ function App() {
   const [score, setScore] = useState(0);
   const [currency, setCurrency] = useState(150);
   const [multiplier, setMultiplier] = useState(2);
-
-  const increaseScore = () => {
-    setScore(score + 1);
-    setCurrency(currency + 1 * multiplier);
-  };
+  const [isMoneyMadeDisplayVisible, setIsMoneyMadeDisplayVisible] =
+    useState(false);
+  const [amountJustMade, setAmountJustMade] = useState(0);
+  const [totalCurrency, setTotalCurrency] = useState(0);
+  const [level, setLevel] = useState(1);
 
   const increaseCurrency = (amount: number) => {
     setCurrency((prevCurrency) => {
       return prevCurrency + amount;
-      console.log("setting curreny ");
     });
+    setIsMoneyMadeDisplayVisible(true);
+    setAmountJustMade(amount);
+    setTotalCurrency((prevTotal) => prevTotal + amount);
   };
 
   const purchaseBasicUpgrade = (upgrade: BasicUpgrade) => {
@@ -72,18 +72,43 @@ function App() {
     //   return newCurrency;
     // });
   };
+  const MoneyMadeDisplay = () => {
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setIsMoneyMadeDisplayVisible(false);
+      }, 1000); // Hide the coin after 1 second
+
+      return () => clearTimeout(timer); // Cleanup the timer on unmount
+    }, []);
+    return (
+      <div className="fixed right-8 top-8 w-24 h-24 bg-red-500 rounded-full grid place-content-center text-3xl font-bold animate-pulse">
+        +${amountJustMade}
+      </div>
+    );
+  };
 
   return (
     <main className="grid bg-[#83924C] place-content-center min-h-screen">
-      <div onClick={increaseScore} className="fixed h-screen w-screen -z-40  ">
-        <ScoreDisplay
-          score={score}
-          currency={currency}
-          multiplier={multiplier}
+      {isMoneyMadeDisplayVisible && <MoneyMadeDisplay></MoneyMadeDisplay>}
+      <ScoreDisplay
+        increaseCurrency={increaseCurrency}
+        score={score}
+        currency={currency}
+        multiplier={multiplier}
+      />
+
+      <div className="flex gap-24">
+        <Plot
+          increaseCurrency={increaseCurrency}
+          cropName="carrot"
+          amountOfTiles={9}
+        />
+        <Plot
+          increaseCurrency={increaseCurrency}
+          cropName="potato"
+          amountOfTiles={9}
         />
       </div>
-
-      <SoilLevelOne increaseCurrency={increaseCurrency} />
 
       <div className="border z-40 bottom-4 absolute w-full justify-center py-1 flex gap-8">
         {upgrades.map((upgrade, upgradeIdx) => (
@@ -97,60 +122,6 @@ function App() {
     </main>
   );
 }
-
-const SoilLevelOne = ({ increaseCurrency }: any) => {
-  const [soil, setSoil] = useState(Array(9).fill(null));
-  const [soilColor, setSoilColor] = useState("#A0522D");
-
-  return (
-    <div className="grid grid-cols-3 gap-4">
-      {soil.map((_, idx) => {
-        return (
-          <Soil
-            key={idx}
-            cropName={"carrot"}
-            cropProfit={10}
-            increaseCurrency={increaseCurrency}
-          />
-        );
-      })}
-    </div>
-  );
-};
-
-const Soil = ({ cropName, cropProfit, increaseCurrency }: Crop) => {
-  const [stage, setStage] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStage((prevStage) => {
-        if (prevStage >= 3) return prevStage;
-        return prevStage + 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const harvest = () => {
-    console.log("Attempting to harvest!");
-    if (stage === 3) {
-      increaseCurrency(cropProfit);
-      setStage(0);
-      console.log("harvested!");
-      return;
-    }
-    console.log("not ready to harvest yet!");
-  };
-
-  return (
-    <div onClick={() => harvest()} className="w-20 h-20 bg-[#A0522D] border ">
-      {cropName}
-      <br />
-      stage: {stage}
-    </div>
-  );
-};
 
 const Upgrade = (props: {
   upgrade: BasicUpgrade;
@@ -175,26 +146,28 @@ const Upgrade = (props: {
   );
 };
 
-const MouseCoin = () => {
-  useEffect(() => {}, []);
-  return (
-    <div className="fixed w-10 h-10 bg-amber-700 rounded-full animate-ping"></div>
-  );
-};
-
 const ScoreDisplay = (props: {
   score: number;
   currency: number;
   multiplier: number;
+  increaseCurrency: (amount: number) => void;
 }) => {
   return (
     <>
       {createPortal(
-        <div className="fixed font-bold text-2xl top-2 border p-16 grid place-content-center left-2">
-          <div>Clicks : {props.score}</div>
-          <div>Currency : ${props.currency}</div>
-          <div>Multiplier : {props.multiplier}</div>
-        </div>,
+        <section className="flex gap-8 fixed left-2 top-2">
+          <div className=" font-bold text-2xl  border bg-white/50 p-8 rounded-lg shadow-lg grid gap-2 place-content-center ">
+            <div>👆 Clicks: {props.score}</div>
+            <div>💰 Currency: ${props.currency}</div>
+            <div>🌾 Multiplier: x{props.multiplier}</div>
+          </div>
+          <div
+            onClick={() => props.increaseCurrency(1)}
+            className="p-10 grid place-content-center bg-white/90 rounded-lg shadow-lg border "
+          >
+            <p className="pointer-events-none">Coin</p>
+          </div>
+        </section>,
 
         document.body
       )}
