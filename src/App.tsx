@@ -10,37 +10,10 @@ import Plot from "./components/Plot";
 // Create an Update Queue - upgrades that are not shown can be bought after the buying the ones first in the queue.
 // Pointer events none not working on the coin
 
-const upgrades = [
-  {
-    id: 1,
-    name: "2x Crop Multiplier",
-    description: "Triple your coins per click!",
-    cost: 50,
-    multiplier: 2,
-    requiredLevel: 1,
-  },
-  {
-    id: 2,
-    name: "3x Crop Multiplier",
-    description: "Triple your crops per click!",
-    cost: 150,
-    multiplier: 3,
-    requiredLevel: 2,
-  },
-];
-
-interface BasicUpgrade {
-  id: number;
-  name: string;
-  description: string;
-  multiplier: number;
-  cost: number;
-}
-
 function App() {
   const [score, setScore] = useState(0);
   const [currency, setCurrency] = useState(150);
-  const [multiplier, setMultiplier] = useState(2);
+  const [multiplier, setMultiplier] = useState(1);
   const [isMoneyMadeDisplayVisible, setIsMoneyMadeDisplayVisible] =
     useState(false);
   const [amountJustMade, setAmountJustMade] = useState(0);
@@ -112,22 +85,22 @@ function App() {
 
       <div className="border z-40 bottom-4 absolute w-full justify-center py-1 flex gap-8">
         {upgrades.map((upgrade, upgradeIdx) => (
-          <Upgrade
+          <UpgradeDisplay
             purchaseBasicUpgrade={purchaseBasicUpgrade}
             upgrade={upgrade}
             key={upgradeIdx}
-          ></Upgrade>
+          ></UpgradeDisplay>
         ))}
       </div>
     </main>
   );
 }
 
-const Upgrade = (props: {
+const UpgradeDisplay = (props: {
   upgrade: BasicUpgrade;
   purchaseBasicUpgrade: any;
 }) => {
-  const { cost, description, name, multiplier } = props.upgrade;
+  const { cost, description, name } = props.upgrade;
 
   return (
     <div className="border">
@@ -162,7 +135,7 @@ const ScoreDisplay = (props: {
             <div>🌾 Multiplier: x{props.multiplier}</div>
           </div>
           <div
-            onClick={() => props.increaseCurrency(1)}
+            onClick={() => props.increaseCurrency(1 * props.multiplier)}
             className="p-10 grid place-content-center bg-white/90 rounded-lg shadow-lg border "
           >
             <p className="pointer-events-none">Coin</p>
