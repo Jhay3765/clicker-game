@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Plot from "./components/Plot";
-
+import UpgradeDisplay from "./components/UpgradeDisplay";
 // Store upgradges
 // Show Amount increase when clicked on mouse
 // **** Upgrades *** \\
@@ -29,22 +29,6 @@ function App() {
     setTotalCurrency((prevTotal) => prevTotal + amount);
   };
 
-  const purchaseBasicUpgrade = (upgrade: BasicUpgrade) => {
-    console.log(upgrade);
-    if (currency >= upgrade.cost) {
-      setCurrency(currency - upgrade.cost);
-
-      console.log(upgrade.name + "bought!" + "You Spent " + upgrade.cost);
-      setMultiplier(upgrade.multiplier);
-      return;
-    }
-
-    // setCurrency((prevCurrency) => {
-    //   console.log("setting curreny ");
-    //   const newCurrency = prevCurrency - upgrade.cost;
-    //   return newCurrency;
-    // });
-  };
   const MoneyMadeDisplay = () => {
     useEffect(() => {
       const timer = setTimeout(() => {
@@ -63,6 +47,8 @@ function App() {
   return (
     <main className="grid bg-[#83924C] place-content-center min-h-screen">
       {isMoneyMadeDisplayVisible && <MoneyMadeDisplay></MoneyMadeDisplay>}
+      <UpgradeDisplay />
+
       <ScoreDisplay
         increaseCurrency={increaseCurrency}
         score={score}
@@ -82,42 +68,9 @@ function App() {
           amountOfTiles={9}
         />
       </div>
-
-      <div className="border z-40 bottom-4 absolute w-full justify-center py-1 flex gap-8">
-        {upgrades.map((upgrade, upgradeIdx) => (
-          <UpgradeDisplay
-            purchaseBasicUpgrade={purchaseBasicUpgrade}
-            upgrade={upgrade}
-            key={upgradeIdx}
-          ></UpgradeDisplay>
-        ))}
-      </div>
     </main>
   );
 }
-
-const UpgradeDisplay = (props: {
-  upgrade: BasicUpgrade;
-  purchaseBasicUpgrade: any;
-}) => {
-  const { cost, description, name } = props.upgrade;
-
-  return (
-    <div className="border">
-      <h2>{name}</h2>
-      <p>{description}</p>
-      <p>Cost: ${cost}</p>
-
-      <button
-        className="bg-amber-700 px-4 py-1 z-40 cursor-pointer text-white rounded-md hover:bg-amber-600"
-        disabled={props.upgrade.cost > props.upgrade.cost}
-        onClick={() => props.purchaseBasicUpgrade(props.upgrade)}
-      >
-        Purchase
-      </button>
-    </div>
-  );
-};
 
 const ScoreDisplay = (props: {
   score: number;
