@@ -8,79 +8,53 @@ interface FarmUpgrade {
   apply?: () => void; // optional for custom logic
 }
 
-const setMultiplier = (multiplier: number) => {
-  // Logic to set the multiplier in your state management
-  console.log(`Multiplier set to ${multiplier}`);
-};
+interface UpgradeDisplayProps {
+  upgrades: FarmUpgrade[];
+  currency: number;
+  onPurchase: (upgrade: FarmUpgrade) => void;
+}
+interface UpgradeProps {
+  upgrade: FarmUpgrade;
+  currency: number;
+  onPurchase: (upgrade: FarmUpgrade) => void;
+}
 
-const addPlot = (plotType: string) => {
-  // Logic to add a plot in your state management
-  console.log(`Added plot of type: ${plotType}`);
-};
-
-const enableAutoHarvesting = () => {
-  // Logic to enable auto-harvesting in your state management
-  console.log("Auto-harvesting enabled");
-};
-
-const upgrades: FarmUpgrade[] = [
-  {
-    id: 1,
-    name: "3x Coin Multiplier",
-    description: "Triple your coins per click!",
-    cost: 50,
-    requiredLevel: 1,
-    type: "multiplier",
-    apply: () => setMultiplier(3),
-  },
-  {
-    id: 2,
-    name: "Carrot Plot!",
-    description: "Add a carrot plot to your Farm!",
-    cost: 150,
-    requiredLevel: 2,
-    type: "addPlot",
-    apply: () => addPlot("carrot"), // you'd define this logic
-  },
-  {
-    id: 3,
-    name: "Auto-Harvest",
-    description: "Your crops harvest automatically every few seconds!",
-    cost: 300,
-    type: "autoHarvest",
-    apply: () => enableAutoHarvesting(),
-  },
-];
-
-const UpgradeDisplay = () => {
-  console.log("UpgradeDisplay rendered");
+const UpgradeDisplay = ({
+  upgrades,
+  currency,
+  onPurchase,
+}: UpgradeDisplayProps) => {
   return (
     <div className="border z-40 bottom-4 absolute w-full justify-center py-1 flex gap-8">
-      {upgrades.map((upgrade, upgradeIdx) => (
-        <Upgrade upgrade={upgrade} key={upgradeIdx}></Upgrade>
+      {upgrades.map((upgrade) => (
+        <Upgrade
+          key={upgrade.id}
+          upgrade={upgrade}
+          currency={currency}
+          onPurchase={onPurchase}
+        />
       ))}
     </div>
   );
 };
 
-const Upgrade = (props: { upgrade: FarmUpgrade }) => {
-  const { cost, description, name, apply } = props.upgrade;
-  if (!props.upgrade) return <div>Error: Upgrade not Found</div>;
+const Upgrade = ({ upgrade, currency, onPurchase }: UpgradeProps) => {
+  const { cost, description, name } = upgrade;
+
   return (
-    <div className="border">
-      <h2>{name}</h2>
+    <div className="border p-4 rounded-lg shadow-md bg-white w-64">
+      <h2 className="font-bold text-lg">{name}</h2>
       <p>{description}</p>
-      <p>Cost: ${cost}</p>
+      <p className="text-sm text-gray-600">Cost: ${cost}</p>
 
       <button
-        className="bg-amber-700 px-4 py-1 z-40 cursor-pointer text-white rounded-md hover:bg-amber-600"
-        disabled={props.upgrade.cost > props.upgrade.cost}
-        onClick={() => apply && apply()}
+        className="mt-2 bg-amber-700 px-4 py-1 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
+        disabled={currency < cost}
+        onClick={() => onPurchase(upgrade)}
       >
         Purchase
       </button>
     </div>
   );
 };
-
 export default UpgradeDisplay;
