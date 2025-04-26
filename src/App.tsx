@@ -23,7 +23,7 @@ interface FarmUpgrade {
 
 function App() {
   const [score, setScore] = useState(0);
-  const [currency, setCurrency] = useState(100);
+  const [currency, setCurrency] = useState(1000);
   const [multiplier, setMultiplier] = useState(1);
   const [isMoneyMadeDisplayVisible, setIsMoneyMadeDisplayVisible] =
     useState(false);
@@ -124,19 +124,6 @@ function App() {
   return (
     <main className="grid bg-[#83924C] place-content-center min-h-screen">
       {isMoneyMadeDisplayVisible && <MoneyMadeDisplay></MoneyMadeDisplay>}
-      <UpgradeDisplay
-        upgrades={upgrades}
-        currency={currency}
-        onPurchase={(upgrade) => {
-          if (currency >= upgrade.cost) {
-            setCurrency(currency - upgrade.cost);
-            upgrade.apply?.();
-            setUpgrades((prevUpgrades) =>
-              prevUpgrades.filter((u) => u.id !== upgrade.id)
-            );
-          }
-        }}
-      />
 
       <ScoreDisplay
         increaseCurrency={increaseCurrency}
@@ -145,26 +132,10 @@ function App() {
         multiplier={multiplier}
       />
 
-      <div className="flex gap-24">
-        {isCarrotPlotPurchased ? (
-          <Plot
-            increaseCurrency={increaseCurrency}
-            cropName="carrot"
-            level={carrotPlotLevel}
-          />
-        ) : (
-          <div className="w-0 h-0"></div>
-        )}
+      <div className="flex gap-24 mt-24">
+        <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
 
-        {isPotatoPlotPurchased ? (
-          <Plot
-            increaseCurrency={increaseCurrency}
-            cropName="potato"
-            level={potatoPlotLevel}
-          />
-        ) : (
-          <div className="w-0 h-0"></div>
-        )}
+        <Plot increaseCurrency={increaseCurrency} cropName="potato" />
       </div>
     </main>
   );
