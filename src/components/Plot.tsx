@@ -49,9 +49,9 @@ const Crops = [
 ];
 
 const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
-  const [isPurchased, setIsPurchased] = useState(false);
+  const [isPurchased, setIsPurchased] = useState(true);
   const [level, setLevel] = useState(1);
-  const amountOfTiles = level * 3;
+  const amountOfTiles = level * 24;
   const plot = Array(amountOfTiles).fill(null);
   const autoHarvest = level >= 3;
   const crop = Crops.find((c) => c.name === cropName);
@@ -72,12 +72,12 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
 
   return (
     <div className="flex flex-col items-center p-4 rounded-md">
-      {isPurchased ? (
+      {isPurchased && (
         <>
           <h3 className="text-md font-bold mb-2 capitalize">
             {cropIcon} {cropName} (Lvl {level})
           </h3>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-12 w-fit gap-1  ">
             {plot.map((_, idx) => (
               <Patch
                 key={idx}
@@ -87,30 +87,6 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
                 increaseCurrency={increaseCurrency}
                 autoHarvest={autoHarvest}
               />
-            ))}
-          </div>
-          {level <= 2 ? (
-            <button
-              onClick={upgradeLevel}
-              className="mt-4 px-8 py-2 bg-black text-white rounded-md shadow-md hover:bg-gray-800 transition duration-200"
-            >
-              Upgrade {cropName} Plot to Lvl {level + 1} (${crop?.price})
-            </button>
-          ) : (
-            ""
-          )}
-        </>
-      ) : (
-        <>
-          <button
-            onClick={purchasePlot}
-            className="mb-4 px-8 py-2 bg-black text-white rounded-md shadow-md hover:bg-gray-800 transition duration-200"
-          >
-            Buy {cropName} Plot ${crop?.price}
-          </button>
-          <div className="grid grid-cols-3 gap-2">
-            {new Array(9).fill(null).map((_, idx) => (
-              <DummyPatch key={idx} />
             ))}
           </div>
         </>
@@ -143,14 +119,14 @@ const Patch = ({
   const [patchRef, setPatchRef] = useState<HTMLDivElement | null>(null);
   const crop = Crops.find((c) => c.name === cropName);
   const profit = crop?.profit || cropProfit;
-  const cropColor = crop?.color || "#CCC";
+  const cropStageImage = `/assets/crops/${cropName}/${stage}.png`;
   const cropIcon = crop?.icon || "🌱";
 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
       setStage((prev) => {
-        if (prev >= 3 && autoHarvest && now - lastHarvestTime > 1000) {
+        if (prev >= 4 && autoHarvest && now - lastHarvestTime > 1000) {
           const pos = patchRef?.getBoundingClientRect();
           increaseCurrency(
             profit,
@@ -164,7 +140,7 @@ const Patch = ({
           setLastHarvestTime(now);
           return 0;
         }
-        return prev >= 3 ? prev : prev + 1;
+        return prev >= 4 ? prev : prev + 1;
       });
     }, 2500);
 
@@ -172,7 +148,7 @@ const Patch = ({
   }, [autoHarvest, increaseCurrency, profit, lastHarvestTime, patchRef]);
 
   const harvest = () => {
-    if (stage === 3) {
+    if (stage === 4) {
       const pos = patchRef?.getBoundingClientRect();
       increaseCurrency(
         profit,
@@ -188,24 +164,18 @@ const Patch = ({
     }
   };
 
-  const getStageColor = () => {
-    if (stage === 3) return cropColor;
-    if (stage === 2) return "#6ECB63";
-    if (stage === 1) return "#B0E57C";
-    return "#8B4513";
-  };
-
-  const stageInfo = ["Soil", "Seedling", "Growing", "Ready"][stage];
-
   return (
     <div
       ref={setPatchRef}
       onClick={harvest}
-      style={{ backgroundColor: getStageColor() }}
-      className="w-24 h-24 text-lg border border-black rounded flex flex-col items-center justify-center text-white"
+      className=" text-lg   rounded flex flex-col items-center justify-center text-white"
     >
-      <div>{stage === 3 ? cropIcon : "🌱"}</div>
-      <div>{stageInfo}</div>
+      <img
+        style={{ imageRendering: "pixelated" }}
+        src={cropStageImage}
+        alt=""
+        className="h-10 w-10"
+      />
     </div>
   );
 };

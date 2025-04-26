@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Plot from "./components/Plot";
 import UpgradeDisplay from "./components/UpgradeDisplay";
+import House from "./components/buildings/House";
+import Silo from "./components/buildings/Silo";
+import Coop from "./components/buildings/Coop";
 
 // Store upgradges
 // Show Amount increase when clicked on mouse
@@ -115,14 +118,14 @@ function App() {
       return () => clearTimeout(timer); // Cleanup the timer on unmount
     }, []);
     return (
-      <div className="fixed right-8 top-8 w-24 h-24 bg-red-500 rounded-full grid place-content-center text-3xl font-bold animate-pulse">
+      <div className="fixed right-8 top-8 w-24 h-24 text-yellow-400 grid place-content-center text-3xl font-bold animate-pulse">
         +${amountJustMade}
       </div>
     );
   };
 
   return (
-    <main className="grid bg-[#83924C] place-content-center min-h-screen">
+    <main className="h-screen ">
       {isMoneyMadeDisplayVisible && <MoneyMadeDisplay></MoneyMadeDisplay>}
 
       <ScoreDisplay
@@ -131,12 +134,34 @@ function App() {
         currency={currency}
         multiplier={multiplier}
       />
+      <UpgradeDisplay
+        upgrades={upgrades}
+        currency={currency}
+        onPurchase={(upgrade) => {
+          if (currency >= upgrade.cost) {
+            setCurrency((prevCurrency) => prevCurrency - upgrade.cost);
+            if (upgrade.apply) {
+              upgrade.apply();
+            }
+          } else {
+            console.log("Not enough currency to purchase this upgrade.");
+          }
+        }}
+      />
 
-      <div className="flex gap-24 mt-24">
+      <div className="pt-48 flex justify-center items-end gap-16  w-full">
+        <Silo />
+        <House />
+        <Coop />
+      </div>
+
+      <div className="flex justify-center  w-full gap-8 mt-24">
         <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
 
         <Plot increaseCurrency={increaseCurrency} cropName="potato" />
+        <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
       </div>
+      <FarmGroundBackground />
     </main>
   );
 }
@@ -151,26 +176,35 @@ const ScoreDisplay = (props: {
     <>
       {createPortal(
         <section className="flex gap-8 fixed left-2 top-2">
-          <div className=" font-bold text-2xl  border bg-white/50 p-8 rounded-lg shadow-lg grid gap-2 place-content-center ">
-            <div>👆 Clicks: {props.score}</div>
-            <div>💰 Currency: ${props.currency}</div>
-            <div>🌾 Multiplier: x{props.multiplier}</div>
+          <div className=" font-bold text-xl  border  px-4 py-2 rounded-lg shadow-lg grid place-content-center  bg-gradient-to-r from-blue-300 to-indigo-300 border-black/50 hover:bg-black">
+            <div> Clicks: {props.score}</div>
+            <div> Currency: ${props.currency}</div>
+            <div> Multiplier: x{props.multiplier}</div>
           </div>
           <div
             onClick={() => props.increaseCurrency(1 * props.multiplier)}
-            className="p-10 grid relative place-content-center rounded-lg shadow-lg active:bg-amber-300/20 border hover:bg-black/10 border-black/90"
+            className="opacity-90 justify-center flex-col items-center flex hover:opacity-100 cursor-pointer grayscale-25 hover:grayscale-0 active:scale-105 transition-all duration-200 active:text-white relative  rounded-lg shadow-lg h-fit w-fit p-1 px-2 bg-gradient-to-r from-yellow-600 to-orange-600 border  border-black/50 hover:bg-black"
           >
-            <div>
-              <p className="pointer-events-none text-5xl absolute -z-40 top-5 left-2">
-                💰
-              </p>
-            </div>
+            <img
+              className="h-20 w-20 pointer-events-none "
+              src="/assets/icons/wood.png"
+              alt=""
+            />
+            <p className=" font-bold pointer-events-none tracking-tight">
+              Make Money
+            </p>
           </div>
         </section>,
 
         document.body
       )}
     </>
+  );
+};
+
+const FarmGroundBackground = () => {
+  return (
+    <div className="fixed top-0 h-screen bg-[#83924C] -z-40 w-full overflow-hidden"></div>
   );
 };
 
