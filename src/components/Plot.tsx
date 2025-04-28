@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowUp } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface Crop {
@@ -51,7 +52,7 @@ const Crops = [
 const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
   const [isPurchased, setIsPurchased] = useState(true);
   const [level, setLevel] = useState(1);
-  const amountOfTiles = level * 24;
+  const amountOfTiles = level * 12;
   const plot = Array(amountOfTiles).fill(null);
   const autoHarvest = level >= 3;
   const crop = Crops.find((c) => c.name === cropName);
@@ -71,13 +72,27 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center p-4 rounded-md">
+    <div className="flex flex-col  p-4 rounded-lg bg-gradient-to-b from-amber-50 to-amber-100 border border-amber-200 shadow-md">
       {isPurchased && (
         <>
-          <h3 className="text-md font-bold mb-2 capitalize">
-            {cropIcon} {cropName} (Lvl {level})
-          </h3>
-          <div className="grid grid-cols-12 w-fit gap-1  ">
+          <section className="flex justify-between items-center mb-2">
+            <h3 className="text-md font-bold mb-2 capitalize">
+              {cropIcon} {cropName}
+            </h3>
+
+            <div className="flex items-center gap-2">
+              <p>(Lvl {level})</p>
+              <div
+                onClick={upgradeLevel}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white relative flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all cursor-pointer"
+              >
+                <ArrowUp className="w-4 h-4" />
+                <p>Upgrade</p>
+              </div>
+            </div>
+          </section>
+
+          <div className="flex max-w-xl flex-wrap w-fit gap-1  ">
             {plot.map((_, idx) => (
               <Patch
                 key={idx}
@@ -164,17 +179,20 @@ const Patch = ({
     }
   };
 
+  const readyToHarvestStyles =
+    stage === 4 ? "bg-amber-200/50 animate-pulse" : "";
+
   return (
     <div
       ref={setPatchRef}
       onClick={harvest}
-      className=" text-lg   rounded flex flex-col items-center justify-center text-white"
+      className={`text-lg border border-amber-200    rounded flex flex-col items-center justify-center text-white ${readyToHarvestStyles}`}
     >
       <img
         style={{ imageRendering: "pixelated" }}
         src={cropStageImage}
         alt=""
-        className="h-10 w-10"
+        className="h-12 w-12 object-cover p-1 "
       />
     </div>
   );

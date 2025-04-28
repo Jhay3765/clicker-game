@@ -8,7 +8,7 @@ export default function House() {
   };
 
   return (
-    <div className="px-24 flex flex-col items-center relative justify-center">
+    <div className="px-24  flex flex-col items-center relative justify-center">
       <img
         className="h-64 w-64"
         src={`/assets/buildings/house/${houseStage}.png`}

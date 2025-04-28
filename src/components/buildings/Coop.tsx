@@ -12,7 +12,7 @@ export default function Coop() {
   return (
     <div
       className={`
-      flex flex-col items-center justify-center relative`}
+      flex flex-col items-center justify-center relative p-4 rounded-lg bg-gradient-to-b from-amber-50 to-amber-100 border border-amber-200 shadow-md`}
     >
       <img
         className={coolStyles[coopStage]}
@@ -22,7 +22,7 @@ export default function Coop() {
 
       <button
         onClick={upgradeCoop}
-        className="bg-amber-800 grayscale-0 whitespace-nowrap  absolute -bottom-12  text-white font-bold py-2 px-4 rounded-full mt-2 hover:bg-amber-700 transition duration-300 ease-in-out "
+        className="bg-amber-800 grayscale-0 whitespace-nowrap    text-white font-bold py-2 px-4 rounded-full mt-2 hover:bg-amber-700 transition duration-300 ease-in-out "
       >
         Upgrade Coop
       </button>

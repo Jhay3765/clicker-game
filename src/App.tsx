@@ -5,6 +5,7 @@ import UpgradeDisplay from "./components/UpgradeDisplay";
 import House from "./components/buildings/House";
 import Silo from "./components/buildings/Silo";
 import Coop from "./components/buildings/Coop";
+import ScoreDisplay from "./components/ScoreDisplay";
 
 // Store upgradges
 // Show Amount increase when clicked on mouse
@@ -125,7 +126,7 @@ function App() {
   };
 
   return (
-    <main className="h-screen ">
+    <main className="h-screen bg-amber-100">
       {isMoneyMadeDisplayVisible && <MoneyMadeDisplay></MoneyMadeDisplay>}
 
       <ScoreDisplay
@@ -161,51 +162,8 @@ function App() {
         <Plot increaseCurrency={increaseCurrency} cropName="potato" />
         <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
       </div>
-      <FarmGroundBackground />
     </main>
   );
 }
-
-const ScoreDisplay = (props: {
-  score: number;
-  currency: number;
-  multiplier: number;
-  increaseCurrency: (amount: number) => void;
-}) => {
-  return (
-    <>
-      {createPortal(
-        <section className="flex gap-8 fixed left-2 top-2">
-          <div className=" font-bold text-xl  border  px-4 py-2 rounded-lg shadow-lg grid place-content-center  bg-gradient-to-r from-blue-300 to-indigo-300 border-black/50 hover:bg-black">
-            <div> Clicks: {props.score}</div>
-            <div> Currency: ${props.currency}</div>
-            <div> Multiplier: x{props.multiplier}</div>
-          </div>
-          <div
-            onClick={() => props.increaseCurrency(1 * props.multiplier)}
-            className="opacity-90 justify-center flex-col items-center flex hover:opacity-100 cursor-pointer grayscale-25 hover:grayscale-0 active:scale-105 transition-all duration-200 active:text-white relative  rounded-lg shadow-lg h-fit w-fit p-1 px-2 bg-gradient-to-r from-yellow-600 to-orange-600 border  border-black/50 hover:bg-black"
-          >
-            <img
-              className="h-20 w-20 pointer-events-none "
-              src="/assets/icons/wood.png"
-              alt=""
-            />
-            <p className=" font-bold pointer-events-none tracking-tight">
-              Make Money
-            </p>
-          </div>
-        </section>,
-
-        document.body
-      )}
-    </>
-  );
-};
-
-const FarmGroundBackground = () => {
-  return (
-    <div className="fixed top-0 h-screen bg-[#83924C] -z-40 w-full overflow-hidden"></div>
-  );
-};
 
 export default App;
