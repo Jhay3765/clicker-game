@@ -25,7 +25,7 @@ interface FarmUpgrade {
 }
 
 function App() {
-  const [currency, setCurrency] = useState(0);
+  const [currency, setCurrency] = useState(100000);
   const [multiplier, setMultiplier] = useState(1);
   const [isMoneyMadeDisplayVisible, setIsMoneyMadeDisplayVisible] =
     useState(false);
@@ -37,12 +37,12 @@ function App() {
   const [upgrades, setUpgrades] = useState<FarmUpgrade[]>([
     {
       id: 1,
-      name: "3x Coin Multiplier",
-      description: "Triple your coins per click!",
+      name: "2x Coin Multiplier",
+      description: "Double your coins per click!",
       cost: 50,
       requiredLevel: 1,
       type: "multiplier",
-      apply: () => increaseMultiplier(3),
+      apply: () => increaseMultiplier(2),
     },
     {
       id: 2,
@@ -52,6 +52,15 @@ function App() {
       requiredLevel: 2,
       type: "addPlot",
       apply: () => addPlot("carrot"),
+    },
+    {
+      id: 3,
+      name: "3x Coin Multiplier",
+      description: "Triple your coins per click!",
+      cost: 400,
+      requiredLevel: 2,
+      type: "multiplier",
+      apply: () => increaseMultiplier(3),
     },
 
     {
@@ -123,7 +132,7 @@ function App() {
   };
 
   return (
-    <main className="h-screen bg-amber-100">
+    <main className="min-h-screen bg-amber-100">
       {isMoneyMadeDisplayVisible && <MoneyMadeDisplay></MoneyMadeDisplay>}
 
       <ScoreDisplay
@@ -145,7 +154,7 @@ function App() {
         <Coop />
       </div>
 
-      <div className="flex px-4 w-full gap-8 mt-24">
+      <div className="flex px-4 w-full flex-wrap gap-8 mt-24">
         {isCarrotPlotPurchased && (
           <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
         )}

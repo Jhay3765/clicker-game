@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUp } from "lucide-react";
+import { Coins } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const MAX_LEVEL = 3;
@@ -31,7 +31,8 @@ const Crops = [
     profit: 10,
     color: "#FFA500",
     icon: "🥕",
-    price: "150",
+    upgradePrice: 150,
+    upgradePrice2: 300,
   },
   {
     id: 2,
@@ -39,7 +40,8 @@ const Crops = [
     profit: 20,
     color: "#D2B48C",
     icon: "🥔",
-    price: "150",
+    upgradePrice: 150,
+    upgradePrice2: 300,
   },
   {
     id: 3,
@@ -47,68 +49,72 @@ const Crops = [
     profit: 30,
     color: "#FFD700",
     icon: "🌽",
-    price: "150",
+    upgradePrice: 150,
+    upgradePrice2: 300,
   },
 ];
 
 const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
-  const [isPurchased, setIsPurchased] = useState(true);
   const [level, setLevel] = useState(1);
   const amountOfTiles = level * 12;
   const plot = Array(amountOfTiles).fill(null);
   const autoHarvest = level >= 3;
   const crop = Crops.find((c) => c.name === cropName);
   const cropIcon = crop?.icon || "🌱";
+  const upgradePrice = level === 1 ? crop?.upgradePrice : crop?.upgradePrice2;
 
   const upgradeLevel = () => {
     if (!crop) return;
     if (level >= MAX_LEVEL) return;
+    if (!upgradePrice) return;
 
     setLevel((prev) => prev + 1);
-    increaseCurrency(-crop.price);
-  };
-
-  const purchasePlot = () => {
-    if (!crop) return;
-    increaseCurrency(-crop.price);
-    setIsPurchased(true);
+    increaseCurrency(-upgradePrice);
   };
 
   return (
     <div className="flex flex-col  p-4 rounded-lg bg-gradient-to-b from-amber-50 to-amber-100 border border-amber-200 shadow-md">
-      {isPurchased && (
-        <>
-          <section className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-bold mb-2 capitalize">
-              {cropIcon} {cropName}
-            </h3>
+      <>
+        <section className="flex justify-between items-center mb-2">
+          <h3 className="text-md font-bold mb-2 capitalize">
+            {cropIcon} {cropName}
+          </h3>
 
-            <div className="flex items-center gap-2">
-              <p>(Lvl {level})</p>
+          <div className="flex  items-center gap-2">
+            <p className="bg-amber-500 px-4 rounded-full font-semibold text-amber-900">
+              Lvl {level}
+            </p>
 
-              <UpgradeButton upgradeLevel={upgradeLevel} level={level} />
-            </div>
-          </section>
-
-          <div className="flex max-w-xl flex-wrap w-fit gap-1  ">
-            {plot.map((_, idx) => (
-              <Patch
-                key={idx}
-                patchId={idx}
-                cropName={cropName}
-                cropProfit={crop?.profit || 10}
-                increaseCurrency={increaseCurrency}
-                autoHarvest={autoHarvest}
-              />
-            ))}
+            <UpgradeButton
+              upgradePrice={upgradePrice}
+              upgradeLevel={upgradeLevel}
+              level={level}
+            />
           </div>
-        </>
-      )}
+        </section>
+
+        <div className="flex max-w-xl flex-wrap w-fit gap-1  ">
+          {plot.map((_, idx) => (
+            <Patch
+              key={idx}
+              patchId={idx}
+              cropName={cropName}
+              cropProfit={crop?.profit || 10}
+              increaseCurrency={increaseCurrency}
+              autoHarvest={autoHarvest}
+            />
+          ))}
+        </div>
+      </>
     </div>
   );
 };
 
-const UpgradeButton = (props: { upgradeLevel: () => void; level: number }) => {
+const UpgradeButton = (props: {
+  upgradeLevel: () => void;
+  level: number;
+  upgradePrice: number;
+}) => {
   const isUpgradeAvailable = props.level <= MAX_LEVEL - 1;
 
   return (
@@ -118,8 +124,11 @@ const UpgradeButton = (props: { upgradeLevel: () => void; level: number }) => {
           onClick={props.upgradeLevel}
           className="bg-emerald-500 hover:bg-emerald-600 text-white relative flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all cursor-pointer"
         >
-          <ArrowUp className="w-4 h-4" />
           <p>UPGRADE</p>
+          <aside className="px-2 items-center flex gap-1  bg-emerald-400 rounded-full">
+            <Coins className="w-4 h-4" />
+            <p>{props.upgradePrice}</p>
+          </aside>
         </div>
       ) : (
         <div className="bg-gray-300 text-gray-500 relative flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all cursor-not-allowed">
@@ -147,7 +156,6 @@ const Patch = ({
   const crop = Crops.find((c) => c.name === cropName);
   const profit = crop?.profit || cropProfit;
   const cropStageImage = `/assets/crops/${cropName}/${stage}.png`;
-  const cropIcon = crop?.icon || "🌱";
 
   useEffect(() => {
     const interval = setInterval(() => {
