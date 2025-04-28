@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { createPortal } from "react-dom";
 import Plot from "./components/Plot";
 import UpgradeDisplay from "./components/UpgradeDisplay";
 import House from "./components/buildings/House";
@@ -26,18 +25,15 @@ interface FarmUpgrade {
 }
 
 function App() {
-  const [score, setScore] = useState(0);
-  const [currency, setCurrency] = useState(1000);
+  const [currency, setCurrency] = useState(0);
   const [multiplier, setMultiplier] = useState(1);
   const [isMoneyMadeDisplayVisible, setIsMoneyMadeDisplayVisible] =
     useState(false);
   const [amountJustMade, setAmountJustMade] = useState(0);
   const [totalCurrency, setTotalCurrency] = useState(0);
   const [isCarrotPlotPurchased, setIsCarrotPlotPurchased] = useState(false);
-  const [carrotPlotLevel, setCarrotPlotLevel] = useState(1);
   const [isPotatoPlotPurchased, setIsPotatoPlotPurchased] = useState(false);
-  const [potatoPlotLevel, setPotatoPlotLevel] = useState(2);
-  const [level, setLevel] = useState(1);
+  const [playerLevel, setPlayerLevel] = useState(1);
   const [upgrades, setUpgrades] = useState<FarmUpgrade[]>([
     {
       id: 1,
@@ -46,35 +42,33 @@ function App() {
       cost: 50,
       requiredLevel: 1,
       type: "multiplier",
-      apply: () => setMultiplier(2),
+      apply: () => increaseMultiplier(3),
     },
     {
       id: 2,
       name: "Carrot Plot!",
       description: "Add a carrot plot to your Farm!",
-      cost: 150,
+      cost: 300,
       requiredLevel: 2,
       type: "addPlot",
       apply: () => addPlot("carrot"),
     },
-    {
-      id: 3,
-      name: "Auto-Harvest",
-      description: "Your crops harvest automatically every few seconds!",
-      cost: 300,
-      type: "autoHarvest",
-      apply: () => enableAutoHarvesting(),
-    },
+
     {
       id: 4,
-      name: "Upgrade Carrot Plot!",
-      description: "Level up your carrot plot to increase its yield!",
-      cost: 300,
-      requiredLevel: 2,
-      type: "levelUp",
-      apply: () => levelUpPlot("carrot"),
+      name: "Potato Plot!",
+      description: "Add a potato plot to your Farm!",
+      cost: 500,
+      requiredLevel: 3,
+      type: "addPlot",
+      apply: () => addPlot("potato"),
     },
   ]);
+
+  const increaseMultiplier = (amount: number) => {
+    setMultiplier((prevMultiplier) => prevMultiplier + amount);
+    setPlayerLevel((prevLevel) => prevLevel + 1);
+  };
 
   const increaseCurrency = useCallback((amount: number) => {
     setCurrency((prevCurrency) => {
@@ -84,16 +78,6 @@ function App() {
     setAmountJustMade(amount);
     setTotalCurrency((prevTotal) => prevTotal + amount);
   }, []);
-
-  const levelUpPlot = (plotType: string) => {
-    if (plotType === "carrot") {
-      setCarrotPlotLevel((prevLevel) => prevLevel + 1);
-    } else if (plotType === "potato") {
-      setPotatoPlotLevel((prevLevel) => prevLevel + 1);
-    }
-    // Logic to level up the plot in your state management
-    console.log(`Leveled up plot of type: ${plotType}`);
-  };
 
   const addPlot = (plotType: string) => {
     if (plotType === "carrot") {
@@ -105,11 +89,24 @@ function App() {
     console.log(`Added plot of type: ${plotType}`);
   };
 
-  const enableAutoHarvesting = () => {
-    // Logic to enable auto-harvesting in your state management
-    console.log("Auto-harvesting enabled");
+  const onPurchase = (id: number) => {
+    const upgrade = upgrades.find((upgrade) => upgrade.id === id);
+    if (!upgrade) {
+      console.log("Upgrade not found.");
+      return;
+    }
+    if (currency >= upgrade.cost) {
+      setCurrency((prevCurrency) => prevCurrency - upgrade.cost);
+      if (upgrade.apply) {
+        upgrade.apply();
+      }
+      setUpgrades((prevUpgrades) =>
+        prevUpgrades.filter((upgrade) => upgrade.id !== id)
+      );
+    } else {
+      console.log("Not enough currency to purchase this upgrade.");
+    }
   };
-
   const MoneyMadeDisplay = () => {
     useEffect(() => {
       const timer = setTimeout(() => {
@@ -130,24 +127,16 @@ function App() {
       {isMoneyMadeDisplayVisible && <MoneyMadeDisplay></MoneyMadeDisplay>}
 
       <ScoreDisplay
+        totalCurrency={totalCurrency}
         increaseCurrency={increaseCurrency}
-        score={score}
         currency={currency}
         multiplier={multiplier}
       />
       <UpgradeDisplay
+        playerLevel={playerLevel}
         upgrades={upgrades}
         currency={currency}
-        onPurchase={(upgrade) => {
-          if (currency >= upgrade.cost) {
-            setCurrency((prevCurrency) => prevCurrency - upgrade.cost);
-            if (upgrade.apply) {
-              upgrade.apply();
-            }
-          } else {
-            console.log("Not enough currency to purchase this upgrade.");
-          }
-        }}
+        onPurchase={onPurchase}
       />
 
       <div className="pt-48 flex justify-center items-end gap-16  w-full">
@@ -156,11 +145,13 @@ function App() {
         <Coop />
       </div>
 
-      <div className="flex justify-center  w-full gap-8 mt-24">
-        <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
-
-        <Plot increaseCurrency={increaseCurrency} cropName="potato" />
-        <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
+      <div className="flex px-4 w-full gap-8 mt-24">
+        {isCarrotPlotPurchased && (
+          <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
+        )}
+        {isPotatoPlotPurchased && (
+          <Plot increaseCurrency={increaseCurrency} cropName="potato" />
+        )}
       </div>
     </main>
   );

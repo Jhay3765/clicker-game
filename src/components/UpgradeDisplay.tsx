@@ -1,6 +1,6 @@
 "use client";
 
-import { Leaf, Maximize2, BotIcon as Robot, Sparkles } from "lucide-react";
+import { Leaf, Maximize2, Sparkles } from "lucide-react";
 
 interface FarmUpgrade {
   id: number;
@@ -8,14 +8,14 @@ interface FarmUpgrade {
   description: string;
   cost: number;
   requiredLevel?: number;
-  type: "multiplier" | "addPlot" | "autoHarvest" | "custom";
+  type: "multiplier" | "addPlot" | "autoHarvest" | "custom" | "levelUp";
   apply?: () => void; // optional for custom logic
 }
 
 interface UpgradeDisplayProps {
   upgrades: FarmUpgrade[];
   currency: number;
-  onPurchase: (upgrade: FarmUpgrade) => void;
+  onPurchase: (id: number) => void;
   playerLevel?: number;
 }
 
@@ -56,7 +56,7 @@ export default function UpgradeDisplay({
 interface UpgradeCardProps {
   upgrade: FarmUpgrade;
   currency: number;
-  onPurchase: (upgrade: FarmUpgrade) => void;
+  onPurchase: (id: number) => void;
   playerLevel: number;
 }
 
@@ -66,7 +66,7 @@ function CompactUpgradeCard({
   onPurchase,
   playerLevel,
 }: UpgradeCardProps) {
-  const { id, name, description, cost, type, requiredLevel = 1 } = upgrade;
+  const { name, description, cost, type, requiredLevel = 1 } = upgrade;
 
   const canAfford = currency >= cost;
   const meetsLevelRequirement = playerLevel >= requiredLevel;
@@ -79,8 +79,7 @@ function CompactUpgradeCard({
         return <Sparkles className="h-3.5 w-3.5 text-yellow-400" />;
       case "addPlot":
         return <Maximize2 className="h-3.5 w-3.5 text-green-400" />;
-      case "autoHarvest":
-        return <Robot className="h-3.5 w-3.5 text-blue-400" />;
+
       case "custom":
         return <Leaf className="h-3.5 w-3.5 text-purple-400" />;
       default:
@@ -139,7 +138,7 @@ function CompactUpgradeCard({
           <button
             className={buttonClass}
             disabled={!canPurchase}
-            onClick={() => canPurchase && onPurchase(upgrade)}
+            onClick={() => canPurchase && onPurchase(upgrade.id)}
           >
             {!canAfford
               ? "Can't afford"

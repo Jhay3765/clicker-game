@@ -3,6 +3,8 @@
 import { ArrowUp } from "lucide-react";
 import { useState, useEffect } from "react";
 
+const MAX_LEVEL = 3;
+
 interface Crop {
   cropProfit: number;
   cropName: string;
@@ -60,6 +62,7 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
 
   const upgradeLevel = () => {
     if (!crop) return;
+    if (level >= MAX_LEVEL) return;
 
     setLevel((prev) => prev + 1);
     increaseCurrency(-crop.price);
@@ -82,13 +85,8 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
 
             <div className="flex items-center gap-2">
               <p>(Lvl {level})</p>
-              <div
-                onClick={upgradeLevel}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white relative flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all cursor-pointer"
-              >
-                <ArrowUp className="w-4 h-4" />
-                <p>Upgrade</p>
-              </div>
+
+              <UpgradeButton upgradeLevel={upgradeLevel} level={level} />
             </div>
           </section>
 
@@ -110,18 +108,32 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
   );
 };
 
+const UpgradeButton = (props: { upgradeLevel: () => void; level: number }) => {
+  const isUpgradeAvailable = props.level <= MAX_LEVEL - 1;
+
+  return (
+    <>
+      {isUpgradeAvailable ? (
+        <div
+          onClick={props.upgradeLevel}
+          className="bg-emerald-500 hover:bg-emerald-600 text-white relative flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all cursor-pointer"
+        >
+          <ArrowUp className="w-4 h-4" />
+          <p>UPGRADE</p>
+        </div>
+      ) : (
+        <div className="bg-gray-300 text-gray-500 relative flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all cursor-not-allowed">
+          <p>MAX LEVEL</p>
+        </div>
+      )}
+    </>
+  );
+};
+
 interface PatchProps extends Crop {
   autoHarvest: boolean;
   patchId: number;
 }
-
-const DummyPatch = () => {
-  return (
-    <div className="w-24 h-24 text-lg border border-black rounded flex flex-col items-center justify-center text-white">
-      <div>Soil</div>
-    </div>
-  );
-};
 
 const Patch = ({
   cropName,
