@@ -20,7 +20,7 @@ interface FarmUpgrade {
   description: string;
   cost: number;
   requiredLevel?: number;
-  type: "multiplier" | "addPlot" | "autoHarvest" | "custom" | "levelUp";
+  type: "multiplier" | "addStructure" | "autoHarvest" | "custom" | "levelUp";
   apply?: () => void; // optional for custom logic
 }
 
@@ -33,6 +33,7 @@ function App() {
   const [totalCurrency, setTotalCurrency] = useState(0);
   const [isCarrotPlotPurchased, setIsCarrotPlotPurchased] = useState(false);
   const [isPotatoPlotPurchased, setIsPotatoPlotPurchased] = useState(false);
+  const [isCoopPurchased, setIsCoopPurchased] = useState(false);
   const [playerLevel, setPlayerLevel] = useState(1);
   const [upgrades, setUpgrades] = useState<FarmUpgrade[]>([
     {
@@ -50,8 +51,8 @@ function App() {
       description: "Add a carrot plot to your Farm!",
       cost: 300,
       requiredLevel: 2,
-      type: "addPlot",
-      apply: () => addPlot("carrot"),
+      type: "addStructure",
+      apply: () => addStructure("carrot"),
     },
     {
       id: 3,
@@ -69,8 +70,17 @@ function App() {
       description: "Add a potato plot to your Farm!",
       cost: 500,
       requiredLevel: 3,
-      type: "addPlot",
-      apply: () => addPlot("potato"),
+      type: "addStructure",
+      apply: () => addStructure("potato"),
+    },
+    {
+      id: 5,
+      name: "Chicken Coop!",
+      description: "Add a chicken coop to your Farm!",
+      cost: 1500,
+      requiredLevel: 3,
+      type: "addStructure",
+      apply: () => addStructure("coop"),
     },
   ]);
 
@@ -88,14 +98,16 @@ function App() {
     setTotalCurrency((prevTotal) => prevTotal + amount);
   }, []);
 
-  const addPlot = (plotType: string) => {
-    if (plotType === "carrot") {
+  const addStructure = (structure: string) => {
+    if (structure === "carrot") {
       setIsCarrotPlotPurchased(true);
-    } else if (plotType === "potato") {
+    } else if (structure === "potato") {
       setIsPotatoPlotPurchased(true);
+    } else if (structure === "coop") {
+      setIsCoopPurchased(true);
     }
     // Logic to add a plot in your state management
-    console.log(`Added plot of type: ${plotType}`);
+    console.log(`Added plot of type: ${structure}`);
   };
 
   const onPurchase = (id: number) => {
@@ -151,7 +163,7 @@ function App() {
       <div className="pt-48 flex justify-center items-end gap-16  w-full">
         <Silo />
         <House />
-        <Coop increaseCurrency={increaseCurrency} />
+        {isCoopPurchased && <Coop increaseCurrency={increaseCurrency} />}
       </div>
 
       <div className="flex px-4 w-full flex-wrap gap-8 mt-24">

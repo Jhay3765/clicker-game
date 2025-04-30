@@ -8,7 +8,7 @@ interface FarmUpgrade {
   description: string;
   cost: number;
   requiredLevel?: number;
-  type: "multiplier" | "addPlot" | "autoHarvest" | "custom" | "levelUp";
+  type: "multiplier" | "addStructure" | "autoHarvest" | "custom" | "levelUp";
   apply?: () => void; // optional for custom logic
 }
 
