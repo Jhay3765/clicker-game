@@ -151,7 +151,7 @@ function App() {
       <div className="pt-48 flex justify-center items-end gap-16  w-full">
         <Silo />
         <House />
-        <Coop />
+        <Coop increaseCurrency={increaseCurrency} />
       </div>
 
       <div className="flex px-4 w-full flex-wrap gap-8 mt-24">
