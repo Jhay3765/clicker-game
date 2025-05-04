@@ -2,9 +2,9 @@ import { Coins } from "lucide-react";
 import { useEffect, useState } from "react";
 
 //  Improve The Ui for the Coop
-//  Fix Upgrade button to be disabled when max level is reached
-//  Make the eggs ready state reset when the coop is upgraded
-const MAX_LEVEL = 2;
+// Add a better Ready State
+
+const MAX_LEVEL = 1;
 const UPGRADE_PRICE = 1000;
 
 interface CoopProps {
@@ -17,17 +17,10 @@ export default function Coop(props: CoopProps) {
   const [isEggsReady, setIsEggsReady] = useState(false);
   const [eggStage, setEggStage] = useState(0);
   const coolStyles = ["h-16 w-16 mx-auto", "h-36 w-36 mx-auto"];
-  const getReadyStyles = (style: number) => {
-    switch (style) {
-      case 0:
-        return "";
-      case 1:
-        return "bg-amber-300/50";
-    }
-  };
 
   const upgradeCoop = () => {
     setCoopLevel(1);
+    setIsEggsReady(false);
   };
 
   const collectEggs = () => {
@@ -48,7 +41,7 @@ export default function Coop(props: CoopProps) {
       setEggStage(1);
       setIsEggsReady(true);
       console.log("Eggs are ready!");
-    }, 3000);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [isEggsReady]);
@@ -56,11 +49,11 @@ export default function Coop(props: CoopProps) {
   return (
     <div
       className={`
-      flex flex-col gap-10  relative p-4 rounded-lg bg-gradient-to-b from-amber-50 to-amber-100 border border-amber-200 shadow-md`}
+      gap-4  relative bg-gradient-to-b from-white/50 to-white/50 backdrop-blur-3xl shadow-lg p-4 flex flex-col rounded-2xl border-amber-600`}
     >
       <h3 className="text-md font-bold mb-2 ">🐔 Chicken Coop</h3>
 
-      <div className="px-4 py-4 border border-amber-200 w-fit mx-auto bg-amber-300/50 rounded-lg">
+      <div className="px-4 py-4  w-fit mx-auto  rounded-lg">
         <img
           className={`${coolStyles[coopLevel]}    `}
           src={`/assets/buildings/coop/${coopLevel}.png`}
@@ -68,14 +61,11 @@ export default function Coop(props: CoopProps) {
         />
       </div>
 
-      <button
-        onClick={collectEggs}
-        className={`${getReadyStyles(
-          eggStage
-        )} px-8 py-1  cursor-pointer border-amber-300 `}
-      >
-        {isEggsReady ? "Collect Eggs" : "Eggs are not ready yet!"}
-      </button>
+      <CollectEggsButton
+        collectEggs={collectEggs}
+        eggStage={eggStage}
+        isEggsReady={isEggsReady}
+      />
 
       <div className="flex  items-center gap-2">
         <p className="bg-amber-500 px-4 rounded-full font-semibold text-amber-900">
@@ -87,6 +77,29 @@ export default function Coop(props: CoopProps) {
     </div>
   );
 }
+
+const CollectEggsButton = (props: {
+  collectEggs: () => void;
+  eggStage: number;
+  isEggsReady: boolean;
+}) => {
+  return (
+    <>
+      {props.isEggsReady ? (
+        <button
+          onClick={props.collectEggs}
+          className="w-full py-1 bg-amber-100 rounded-full  cursor-pointer border-amber-300"
+        >
+          Collect Eggs
+        </button>
+      ) : (
+        <button className="w-full py-1 bg-red-400/40  rounded-full    cursor-pointer border-amber-300">
+          Eggs Not Ready
+        </button>
+      )}
+    </>
+  );
+};
 
 const UpgradeButton = (props: {
   upgradeCoop: () => void;

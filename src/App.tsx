@@ -25,15 +25,15 @@ interface FarmUpgrade {
 }
 
 function App() {
-  const [currency, setCurrency] = useState(100000);
+  const [currency, setCurrency] = useState(1000);
   const [multiplier, setMultiplier] = useState(1);
   const [isMoneyMadeDisplayVisible, setIsMoneyMadeDisplayVisible] =
     useState(false);
   const [amountJustMade, setAmountJustMade] = useState(0);
   const [totalCurrency, setTotalCurrency] = useState(0);
-  const [isCarrotPlotPurchased, setIsCarrotPlotPurchased] = useState(false);
-  const [isPotatoPlotPurchased, setIsPotatoPlotPurchased] = useState(false);
-  const [isCoopPurchased, setIsCoopPurchased] = useState(false);
+  const [isCarrotPlotPurchased, setIsCarrotPlotPurchased] = useState(true);
+  const [isPotatoPlotPurchased, setIsPotatoPlotPurchased] = useState(true);
+  const [isCoopPurchased, setIsCoopPurchased] = useState(true);
   const [playerLevel, setPlayerLevel] = useState(1);
   const [upgrades, setUpgrades] = useState<FarmUpgrade[]>([
     {
@@ -144,36 +144,41 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen bg-amber-100">
+    <main className="min-h-screen  bg-black">
+      <img
+        src="/dd.png"
+        alt=""
+        className="bg-cover absolute w-full opacity-50"
+      />
+      <div className="flex gap-8 pt-4 justify-between px-24  ">
+        <section>
+          <div className="flex w-full gap-8 ">
+            <House currency={currency} multiplier={multiplier} />
+
+            <aside className="flex gap-4 flex-col h-full flex-wrap  w-full">
+              {isCarrotPlotPurchased && (
+                <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
+              )}
+
+              {isPotatoPlotPurchased && (
+                <Plot increaseCurrency={increaseCurrency} cropName="potato" />
+              )}
+            </aside>
+          </div>
+          <div className=" flex pt-4 gap-8 w-full h">
+            <Silo increaseCurrency={increaseCurrency} />
+            {isCoopPurchased && <Coop increaseCurrency={increaseCurrency} />}
+          </div>
+        </section>
+        <UpgradeDisplay
+          playerLevel={playerLevel}
+          upgrades={upgrades}
+          currency={currency}
+          onPurchase={onPurchase}
+        />
+      </div>
+
       {isMoneyMadeDisplayVisible && <MoneyMadeDisplay></MoneyMadeDisplay>}
-
-      <ScoreDisplay
-        totalCurrency={totalCurrency}
-        increaseCurrency={increaseCurrency}
-        currency={currency}
-        multiplier={multiplier}
-      />
-      <UpgradeDisplay
-        playerLevel={playerLevel}
-        upgrades={upgrades}
-        currency={currency}
-        onPurchase={onPurchase}
-      />
-
-      <div className="pt-48 flex justify-center items-end gap-16  w-full">
-        <Silo />
-        <House />
-        {isCoopPurchased && <Coop increaseCurrency={increaseCurrency} />}
-      </div>
-
-      <div className="flex px-4 w-full flex-wrap gap-8 mt-24">
-        {isCarrotPlotPurchased && (
-          <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
-        )}
-        {isPotatoPlotPurchased && (
-          <Plot increaseCurrency={increaseCurrency} cropName="potato" />
-        )}
-      </div>
     </main>
   );
 }

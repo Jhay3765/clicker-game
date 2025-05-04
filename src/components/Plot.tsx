@@ -73,7 +73,7 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
   };
 
   return (
-    <div className="flex flex-col  p-4 rounded-lg bg-gradient-to-b from-amber-50 to-amber-100 border border-amber-200 shadow-md">
+    <div className="flex flex-col bg-white/50 backdrop-blur-3xl  p-4 rounded-lg h-fit shadow-md">
       <>
         <section className="flex justify-between items-center mb-2">
           <h3 className="text-md font-bold mb-2 capitalize">
@@ -199,8 +199,7 @@ const Patch = ({
     }
   };
 
-  const readyToHarvestStyles =
-    stage === 4 ? "bg-amber-200/50 animate-pulse" : "";
+  const readyToHarvestStyles = stage === 4 ? "bg-amber-200/50" : "";
 
   return (
     <div
