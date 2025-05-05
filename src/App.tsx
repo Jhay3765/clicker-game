@@ -5,6 +5,7 @@ import House from "./components/buildings/House";
 import Silo from "./components/buildings/Silo";
 import Coop from "./components/buildings/Coop";
 import ScoreDisplay from "./components/ScoreDisplay";
+import Barn from "./components/buildings/Barn";
 
 // Store upgradges
 // Show Amount increase when clicked on mouse
@@ -155,7 +156,7 @@ function App() {
           <div className="flex w-full gap-8 ">
             <House currency={currency} multiplier={multiplier} />
 
-            <aside className="flex gap-4 flex-col h-full flex-wrap  w-full">
+            <aside className="grid grid-cols-2 gap-4 h-full flex-wrap  w-full">
               {isCarrotPlotPurchased && (
                 <Plot increaseCurrency={increaseCurrency} cropName="carrot" />
               )}
@@ -163,11 +164,15 @@ function App() {
               {isPotatoPlotPurchased && (
                 <Plot increaseCurrency={increaseCurrency} cropName="potato" />
               )}
+
+              <Plot increaseCurrency={increaseCurrency} cropName="corn" />
+              <Plot increaseCurrency={increaseCurrency} cropName="pumpkin" />
             </aside>
           </div>
           <div className=" flex pt-4 gap-8 w-full h">
             <Silo increaseCurrency={increaseCurrency} />
             {isCoopPurchased && <Coop increaseCurrency={increaseCurrency} />}
+            <Barn />
           </div>
         </section>
         <UpgradeDisplay

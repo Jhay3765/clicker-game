@@ -30,7 +30,7 @@ const Crops = [
     name: "carrot",
     profit: 10,
     color: "#FFA500",
-    icon: "🥕",
+    icon: "/assets/crops/carrot/icon.png",
     upgradePrice: 150,
     upgradePrice2: 300,
   },
@@ -39,7 +39,7 @@ const Crops = [
     name: "potato",
     profit: 20,
     color: "#D2B48C",
-    icon: "🥔",
+    icon: "/assets/crops/potato/icon.png",
     upgradePrice: 150,
     upgradePrice2: 300,
   },
@@ -48,7 +48,16 @@ const Crops = [
     name: "corn",
     profit: 30,
     color: "#FFD700",
-    icon: "🌽",
+    icon: "/assets/crops/corn/icon.png",
+    upgradePrice: 150,
+    upgradePrice2: 300,
+  },
+  {
+    id: 3,
+    name: "pumpkin",
+    profit: 30,
+    color: "#FFD700",
+    icon: "/assets/crops/pumpkin/icon.png",
     upgradePrice: 150,
     upgradePrice2: 300,
   },
@@ -56,11 +65,11 @@ const Crops = [
 
 const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
   const [level, setLevel] = useState(1);
-  const amountOfTiles = level * 12;
+  const amountOfTiles = level * 6;
   const plot = Array(amountOfTiles).fill(null);
   const autoHarvest = level >= 3;
   const crop = Crops.find((c) => c.name === cropName);
-  const cropIcon = crop?.icon || "🌱";
+  const cropIcon = crop?.icon;
   const upgradePrice = level === 1 ? crop?.upgradePrice : crop?.upgradePrice2;
 
   const upgradeLevel = () => {
@@ -68,7 +77,12 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
     if (level >= MAX_LEVEL) return;
     if (!upgradePrice) return;
 
-    setLevel((prev) => prev + 1);
+    setLevel((prev) => {
+      const newLevel = prev + 1;
+
+      return newLevel;
+    });
+
     increaseCurrency(-upgradePrice);
   };
 
@@ -76,8 +90,8 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
     <div className="flex flex-col bg-white/50 backdrop-blur-3xl  p-4 rounded-lg h-fit shadow-md">
       <>
         <section className="flex justify-between items-center mb-2">
-          <h3 className="text-md font-bold mb-2 capitalize">
-            {cropIcon} {cropName}
+          <h3 className="text-md  flex gap-3 items-center  mb-2 uppercase tracking-tighter font-normal text-orange-900">
+            <img src={cropIcon} alt="" className="h-6 w-6" /> {cropName}
           </h3>
 
           <div className="flex  items-center gap-2">
@@ -93,7 +107,7 @@ const Plot = ({ increaseCurrency, cropName }: PlotProps) => {
           </div>
         </section>
 
-        <div className="flex max-w-xl flex-wrap w-fit gap-1  ">
+        <div className="flex max-w-md flex-wrap w-fit gap-1  ">
           {plot.map((_, idx) => (
             <Patch
               key={idx}
